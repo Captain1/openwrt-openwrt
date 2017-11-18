@@ -28,6 +28,7 @@ all0256n-8M|\
 all5002)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x10000" "0x10000"
 	;;
+xiaomi,miwifi-r3|\
 mir3g)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x1000" "0x20000"
 	;;
