@@ -263,6 +263,23 @@ define Device/VR2600v
 endef
 TARGET_DEVICES += VR2600v
 
+define Device/ap4019-2100
+	$(call Device/FitImage)
+	DEVICE_DTS := qcom-ipq4019-ap4019-2100
+	KERNEL_LOADADDR := 0x80208000
+	KERNEL_INSTALL := 1
+	KERNEL_SIZE := 4096k
+	BLOCKSIZE := 64k
+	PAGESIZE := 2048
+	BOARD_NAME := ap4019-2100
+	DEVICE_TITLE := TEMPE AP4019-2100
+	IMAGES = sysupgrade.bin
+	FILESYSTEMS := squashfs
+	IMAGE/sysupgrade.bin := append-kernel | pad-to $$$${KERNEL_SIZE} | append-rootfs | pad-rootfs | append-metadata
+	DEVICE_PACKAGES := kmod-usb-phy-qcom-ipq4019 kmod-ath10k ath10k-firmware-qca4019 ath10k-firmware-qca9888
+endef
+TARGET_DEVICES += ap4019-2100
+
 define Device/AP-DK01.1-C1
 	PROFILES += $$(DEVICE_NAME)
 	DEVICE_TITLE := QCA AP-DK01.1-C1

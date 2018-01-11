@@ -52,6 +52,10 @@ nbg6817)
 	ucidef_set_interface_macaddr "lan" "$(macaddr_add $hw_mac_addr 2)"
 	ucidef_set_interface_macaddr "wan" "$(macaddr_add $hw_mac_addr 3)"
 	;;
+ap4019-2100)
+	ucidef_add_switch "switch0" \
+		"0t@eth0" "1:lan" "2:lan" "3:lan" "4:lan" "5:wan"
+	;;
 *)
 	echo "Unsupported hardware. Network interfaces not intialized"
 	;;

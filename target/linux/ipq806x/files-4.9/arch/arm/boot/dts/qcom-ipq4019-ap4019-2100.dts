@@ -1,0 +1,314 @@
+/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ */
+
+#include "qcom-ipq4019-ap.dk04.1.dtsi"
+#include "qcom-ipq4019-bus.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/soc/qcom,tcsr.h>
+
+/ {
+	model = "TEMPE AP4019-2100";
+	compatible = "tempe,ap4019-2100", "qcom,ipq4019";
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x10000000>;
+	};
+
+	aliases {
+		led-boot = &power;
+		led-failsafe = &power;
+		led-running = &power;
+		led-upgrade = &power;
+	};
+
+	reserved-memory {
+		#address-cells = <0x1>;
+		#size-cells = <0x1>;
+		ranges;
+
+		rsvd1@87E00000 {
+			reg = <0x87e00000 0x200000>;
+			no-map;
+		};
+	};
+
+	soc {
+		pcie0: qcom,pcie@80000 {
+			compatible = "qcom,msm_pcie";
+			cell-index = <0>;
+			qcom,ctrl-amt = <1>;
+
+			reg = <0x80000 0x2000>,
+			      <0x99000 0x800>,
+			      <0x40000000 0xf1d>,
+			      <0x40000f20 0xa8>,
+			      <0x40100000 0x1000>,
+			      <0x40200000 0x100000>,
+			      <0x40300000 0xd00000>;
+			reg-names = "parf", "phy", "dm_core", "elbi",
+				"conf", "io", "bars";
+
+			#address-cells = <0>;
+			interrupt-parent = <&pcie0>;
+			interrupts = <0 1 2 3 4 5 6 7 8 9 10 11 12>;
+			#interrupt-cells = <1>;
+			interrupt-map-mask = <0xffffffff>;
+			interrupt-map = <0 &intc 0 141 0
+				1 &intc 0 142 0
+				2 &intc 0 143 0
+				3 &intc 0 144 0
+				4 &intc 0 145 0
+				5 &intc 0 146 0
+				6 &intc 0 147 0
+				7 &intc 0 148 0
+				8 &intc 0 149 0
+				9 &intc 0 150 0
+				10 &intc 0 151 0
+				11 &intc 0 152 0 >;
+
+			interrupt-names = "int_msi", "int_a", "int_b", "int_c", "int_d",
+				"int_pls_pme", "int_pme_legacy", "int_pls_err",
+				"int_aer_legacy", "int_pls_link_up",
+				"int_pls_link_down", "int_bridge_flush_n","int_wake";
+
+			qcom,ep-latency = <10>;
+
+			clocks = <&gcc GCC_PCIE_AHB_CLK>,
+				<&gcc GCC_PCIE_AXI_M_CLK>,
+				<&gcc GCC_PCIE_AXI_S_CLK>;
+
+			clock-names =	"pcie_0_cfg_ahb_clk",
+					"pcie_0_mstr_axi_clk",
+					"pcie_0_slv_axi_clk";
+
+			max-clock-frequency-hz = <0>, <0>, <0>;
+
+			resets = <&gcc PCIE_AXI_M_ARES>,
+				<&gcc PCIE_AXI_S_ARES>,
+				<&gcc PCIE_PIPE_ARES>,
+				<&gcc PCIE_AXI_M_VMIDMT_ARES>,
+				<&gcc PCIE_AXI_S_XPU_ARES>,
+				<&gcc PCIE_PARF_XPU_ARES>,
+				<&gcc PCIE_PHY_ARES>,
+				<&gcc PCIE_AXI_M_STICKY_ARES>,
+				<&gcc PCIE_PIPE_STICKY_ARES>,
+				<&gcc PCIE_PWR_ARES>,
+				<&gcc PCIE_AHB_ARES>,
+				<&gcc PCIE_PHY_AHB_ARES>;
+
+			reset-names = "pcie_rst_axi_m_ares",
+				"pcie_rst_axi_s_ares",
+				"pcie_rst_pipe_ares",
+				"pcie_rst_axi_m_vmidmt_ares",
+				"pcie_rst_axi_s_xpu_ares",
+				"pcie_rst_parf_xpu_ares",
+				"pcie_rst_phy_ares",
+				"pcie_rst_axi_m_sticky_ares",
+				"pcie_rst_pipe_sticky_ares",
+				"pcie_rst_pwr_ares",
+				"pcie_rst_ahb_res",
+				"pcie_rst_phy_ahb_ares";
+
+			status = "ok";
+			perst-gpio = <&tlmm 38 0>;
+			wake-gpio = <&tlmm 50 0>;
+			clkreq-gpio = <&tlmm 39 0>;
+		};
+
+		tcsr@194b000 {
+			/* select hostmode */
+			compatible = "qcom,tcsr";
+			reg = <0x194b000 0x100>;
+			qcom,usb-hsphy-mode-select = <TCSR_USB_HSPHY_HOST_MODE>;
+			status = "ok";
+		};
+
+		ess_tcsr@1953000 {
+			compatible = "qcom,tcsr";
+			reg = <0x1953000 0x1000>;
+			qcom,ess-interface-select = <TCSR_ESS_PSGMII>;
+		};
+
+		tcsr@1949000 {
+			compatible = "qcom,tcsr";
+			reg = <0x1949000 0x100>;
+			qcom,wifi_glb_cfg = <TCSR_WIFI_GLB_CFG>;
+		};
+
+		tcsr@1957000 {
+			compatible = "qcom,tcsr";
+			reg = <0x1957000 0x100>;
+			qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
+		};
+
+		mdio@90000 {
+			status = "okay";
+		};
+
+		ess-switch@c000000 {
+			status = "okay";
+		};
+
+		ess-psgmii@98000 {
+			status = "okay";
+		};
+
+		edma@c080000 {
+			status = "okay";
+		};
+
+		wifi0: wifi@a000000 {
+			status = "ok";
+			core-id = <0x0>;
+			qca,msi_addr = <0x0b006040>;
+			qca,msi_base = <0x40>;
+			wifi_led_num = <2>;         /* Wifi 2G */
+			wifi_led_source = <0>;      /* source id 0 */
+			qcom,mtd-name = "0:ART";
+			qcom,cal-offset = <0x1000>;
+			qcom,cal-len = <12064>;
+		};
+
+		wifi1: wifi@a800000 {
+			status = "ok";
+			core-id = <0x1>;
+			qca,msi_addr = <0x0b006040>;
+			qca,msi_base = <0x50>;
+			wifi_led_num = <1>;         /* Wifi 5G */
+			wifi_led_source = <2>;      /* source id 2 */
+			qcom,mtd-name = "UBI_DEV";
+			qcom,cal-offset = <0x66000>;
+			qcom,cal-len = <12064>;
+		};
+
+		nand: qpic-nand@79b0000 {
+			status = "disabled";
+		};
+	};
+
+	gpio_keys {
+			compatible = "gpio-keys";
+
+			button@1 {
+				label = "reset";
+				linux,code = <KEY_RESTART>;
+				gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
+				linux,input-type = <1>;
+			};
+	};
+
+	leds-gpio {
+		compatible = "leds-gpio";
+
+		power: status {
+			label = "ap4019-2100:power:status";
+			gpios = <&tlmm 40 GPIO_ACTIVE_LOW>;
+		};
+
+		wlan5G {
+			label = "wlan5G";
+			gpios = <&tlmm 48 0>;
+		};
+
+		wlan2G {
+			label = "wlan2G";
+			gpios = <&tlmm 49 0>;
+		};
+	};
+};
+
+&spi_0 { /* BLSP1 QUP1 */
+	pinctrl-0 = <&spi_0_pins>;
+	pinctrl-names = "default";
+	status = "ok";
+	cs-gpios = <&tlmm 12 0>;
+
+	mx25l25635e@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+		compatible = "mx25l25635e", "jedec,spi-nor";
+		spi-max-frequency = <24000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition0@0 {
+				label = "0:SBL1";
+				reg = <0x00000000 0x00040000>;
+				read-only;
+			};
+			partition1@40000 {
+				label = "0:MIBIB";
+				reg = <0x00040000 0x00020000>;
+				read-only;
+			};
+			partition2@60000 {
+				label = "0:QSEE";
+				reg = <0x00060000 0x00060000>;
+				read-only;
+			};
+			partition3@c0000 {
+				label = "0:CDT";
+				reg = <0x000c0000 0x00010000>;
+				read-only;
+			};
+			partition4@d0000 {
+				label = "0:DDRPARAMS";
+				reg = <0x000d0000 0x00010000>;
+				read-only;
+			};
+			partition5@e0000 {
+				label = "0:APPSBLENV"; /* uboot env*/
+				reg = <0x000e0000 0x00010000>;
+			};
+			partition6@f0000 {
+				label = "0:APPSBL"; /* uboot */
+				reg = <0x000f0000 0x00080000>;
+				read-only;
+			};
+			partition7@170000 {
+				label = "0:ART";
+				reg = <0x00170000 0x00010000>;
+			};
+			partition8@180000 {
+				label = "kernel";
+				reg = <0x00180000 0x00400000>;
+			};
+			partition9@580000 {
+				label = "rootfs";
+				reg = <0x00580000 0x01600000>;
+			};
+			partition9@180000 {
+				label = "firmware";
+				reg = <0x00180000 0x01a00000>;
+			};
+		};
+	};
+
+	m25p80@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "n25q128a11";
+		reg = <0>;
+		spi-max-frequency = <24000000>;
+		status = "disabled";
+	};
+};
