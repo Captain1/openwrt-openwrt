@@ -191,8 +191,8 @@
 			qca,msi_base = <0x50>;
 			wifi_led_num = <1>;         /* Wifi 5G */
 			wifi_led_source = <2>;      /* source id 2 */
-			qcom,mtd-name = "UBI_DEV";
-			qcom,cal-offset = <0x66000>;
+			qcom,mtd-name = "0:ART";
+			qcom,cal-offset = <0x5000>;
 			qcom,cal-len = <12064>;
 		};
 
